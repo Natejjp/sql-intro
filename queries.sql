@@ -82,7 +82,7 @@ CompanyDatabase2> DELETE FROM "Employees" WHERE "FullName" = 'Lazy Larry';
 CompanyDatabase2> ALTER TABLE "Employees" ADD COLUMN "ParkingSpot" VARCHAR(10);
 
 
-//ADVENTURE MODE
+////////////ADVENTURE MODE\\\\\\\\\\\\\\
 createdb CompanyDatabase3
 
 pgcli CompanyDatabase3
@@ -142,4 +142,100 @@ CompanyDatabase3> SELECT * FROM "Employees";
 | Jim        | 300      | cook          | 3                | True         | 9    |
 | Nate       | 400      | teacher       | 4                | True         | 10   |
 +------------+----------+---------------+------------------+--------------+-----
+
+
+------------------------------------------------------------------------------------------------------
+CompanyDatabase2
+CREATE TABLE "Departments" (
+  "Id" SERIAL PRIMARY KEY,
+  "DepartmentName" TEXT,
+  "Building" TEXT
+  );
+
+  ALTER TABLE "Employees" ADD COLUMN "DepartmentId" INTEGER NULL REFERENCES "Departments" ("Id");
+
+CREATE TABLE "Products" (
+  "Id" SERIAL PRIMARY KEY,
+  "Price" DECIMAL,
+  "Name" TEXT,
+  "Description" TEXT,
+  "QuantityInStock" INT
+  );
+
+CREATE TABLE "Orders" (
+  "Id" SERIAL PRIMARY KEY,
+  "OrderNumber" INT,
+  "DataPlaced" DATE,
+  "Email" TEXT
+  );
+
+CREATE TABLE "ProductOrders" (
+  "Id" SERIAL PRIMARY KEY,
+  "ProductId" INTEGER REFERENCES "Products" ("Id"),
+  "OrderId" INTEGER REFERENCES "Orders" ("Id"),
+  "OrderQuantity" INT
+  );
+
+INSERT INTO "Departments" ("DepartmentName", "Building")
+VALUES ('Development', 'Main');
+INSERT INTO "Departments" ("DepartmentName", "Building")
+VALUES ('Marketing', 'North');
+
+INSERT INTO "Employees" ("FullName", "Salary", "JobPosition", "PhoneExtension", "IsPartTime", "DepartmentId")
+VALUES ('Tim Smith', 40000, 'Programmer', 123, 'false', 1);
+INSERT INTO "Employees" ("FullName", "Salary", "JobPosition", "PhoneExtension", "IsPartTime", "DepartmentId")
+VALUES ('Barbara Ramsey', 80000, 'Manager', 234, 'false', 1);
+INSERT INTO "Employees" ("FullName", "Salary", "JobPosition", "PhoneExtension", "IsPartTime", "DepartmentId")
+VALUES ('Tom Jones', 32000, 'Admin', 456, 'true', 2);
+
+INSERT INTO "Products" ("Price", "Name", "Description", "QuantityInStock")
+VALUES (12.45, 'Widget', 'The Original Widget', 100);
+INSERT INTO "Products" ("Price", "Name", "Description", "QuantityInStock")
+VALUES (99.99, 'Flowbee', 'Perfect for haircuts', 3);
+
+ALTER TABLE "Orders" ALTER COLUMN "OrderNumber" TYPE TEXT;
+
+INSERT INTO "Orders" ("OrderNumber", "DataPlaced", "Email")
+VALUES ('x529', '2020-01-01', 'person@example.com');
+
+ALTER TABLE "Orders" RENAME COLUMN "DataPlaced" TO "DatePlaced";
+
+INSERT INTO "ProductOrders" ("ProductId", "OrderId", "OrderQuantity")
+VALUES (1, 1, 3);
+INSERT INTO "ProductOrders" ("ProductId", "OrderId", "OrderQuantity")
+VALUES (2, 1, 2);
+
+SELECT *
+FROM "Employees"
+JOIN "Departments" ON "Employees"."DepartmentId" = "Departments"."Id"
+WHERE "Building" = 'North side';
+
+SELECT *
+FROM "Employees"
+JOIN "Departments" ON "Employees"."DepartmentId" = "Departments"."Id"
+WHERE "Building" = 'East side';
+
+SELECT *
+FROM "Employees"
+JOIN "Departments" ON "Employees"."DepartmentId" = "Departments"."Id"
+WHERE "Building" = 'Main';
+
+SELECT *
+FROM "Orders"
+JOIN "ProductOrders" ON "Orders"."Id" = "ProductOrders"."OrderId"
+WHERE "ProductId" = 2;
+
+SELECT *
+FROM "ProductOrders"
+JOIN "Products" ON "ProductOrders"."ProductId" = "Products"."Id"
+JOIN "Orders" ON "ProductOrders"."OrderId" = "Orders"."Id"
+WHERE "Name" = 'Flowbee' AND "OrderNumber" = 'x529';
+
+
+
+
+
+
+
+
 
